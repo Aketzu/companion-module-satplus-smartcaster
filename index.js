@@ -191,6 +191,17 @@ instance.prototype.actions = function (system) {
 	})
 }
 
+instance.prototype.reljump = function (itempos) {
+	var self = this
+
+	// Fetch current position first and jump based on that
+	self.client.get(self.config.baseurl + '/api/status', function (data, response) {
+		self.currentIndex = data['Index']
+		var nextindex = data['Index'] + itempos
+		self.apicall('POST', 'control/jumpto/' + nextindex)
+	})
+}
+
 instance.prototype.apicall = function (method, path) {
 	var self = this
 	fn = null
@@ -241,9 +252,7 @@ instance.prototype.action = function (action) {
 			self.apicall('POST', 'control/jumpto/' + opt['index'])
 			break
 		case 'jumprel':
-			self.updateState()
-			var newitem = self.currentIndex + parseInt(opt['index'])
-			self.apicall('POST', 'control/jumpto/' + newitem)
+			self.reljump(parseInt(opt['index']))
 			break
 		case 'cue':
 			self.apicall('POST', 'control/cue/' + opt['index'])
